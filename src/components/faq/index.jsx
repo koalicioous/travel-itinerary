@@ -16,7 +16,7 @@ const FaqAccordion = ({ faqList }) => {
               setActiveQuestion(activeQuestion === index ? null : index)
             }
           >
-            <span>{faq.question}</span>
+            <span className="text-sm md:text-base">{faq.question}</span>
             <FontAwesomeIcon
               icon={faChevronDown}
               className={`ml-2 w-5 h-5 transition-transform ${
@@ -35,7 +35,9 @@ const FaqAccordion = ({ faqList }) => {
           >
             {(ref) => (
               <div ref={ref} className="overflow-hidden px-4 pb-4 pt-2">
-                <p className="text-gray-600">{faq.answer}</p>
+                <p className="text-gray-600 text-sm md:text-base">
+                  {faq.answer}
+                </p>
               </div>
             )}
           </Transition>

@@ -189,7 +189,7 @@ export default function Home() {
           <section className="flex flex-col md:flex-row items-center gap-4">
             <Link
               href="/order"
-              className="py-2 md:py-4 px-3 md:px-6 rounded-lg bg-blue-700 text-white w-full md:w-auto"
+              className="py-2 md:py-4 px-3 md:px-6 rounded-lg bg-blue-700 text-white w-full md:w-auto text-center"
             >
               Order Now ($10)
             </Link>
@@ -297,7 +297,7 @@ export default function Home() {
               })}
             </div>
           </section>
-          <section className="bg-blue-700 rounded-xl p-4 md:p-8 px-8 md:px-12 mt-20 shadow-xl border border-blue-500 shadow-blue-400">
+          <section className="bg-blue-700 rounded-xl p-4 md:p-8 px-4 md:px-12 mt-20 shadow-xl border border-blue-500 shadow-blue-400">
             <div className="text-center text-2xl md:text-3xl text-white font-semibold">
               Affordable Pricing
             </div>
@@ -330,7 +330,7 @@ export default function Home() {
             <div className="flex items-center justify-between">
               <Link
                 href="/order"
-                className="py-4 px-6 rounded-lg bg-white text-blue-700 font-bold"
+                className="py-4 px-6 rounded-lg bg-white text-blue-700 font-bold text-center"
               >
                 Order Now
               </Link>
@@ -373,7 +373,7 @@ export default function Home() {
             <div className="flex items-center justify-center mt-4 md:mt-12">
               <Link
                 href="/order"
-                className="py-4 px-24 font-bold rounded-lg bg-blue-700 text-white"
+                className="py-4 px-24 font-bold rounded-lg bg-blue-700 text-white text-center"
               >
                 Order Now
               </Link>

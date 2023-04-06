@@ -13,6 +13,7 @@ import {
   faCloudDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import FaqAccordion from "@/components/faq";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -186,9 +187,12 @@ export default function Home() {
             </div>
           </section>
           <section className="flex flex-col md:flex-row items-center gap-4">
-            <button className="py-2 md:py-4 px-3 md:px-6 rounded-lg bg-blue-700 text-white w-full md:w-auto">
+            <Link
+              href="/order"
+              className="py-2 md:py-4 px-3 md:px-6 rounded-lg bg-blue-700 text-white w-full md:w-auto"
+            >
               Order Now ($10)
-            </button>
+            </Link>
             <button className="py-4 px-4 rounded-lg w-full md:w-auto">
               See a Preview &#8594;
             </button>
@@ -324,9 +328,12 @@ export default function Home() {
               })}
             </div>
             <div className="flex items-center justify-between">
-              <button className="py-4 px-6 rounded-lg bg-white text-blue-700 font-bold">
+              <Link
+                href="/order"
+                className="py-4 px-6 rounded-lg bg-white text-blue-700 font-bold"
+              >
                 Order Now
-              </button>
+              </Link>
               <div className="text-white mr-4 text-4xl font-semibold">$10</div>
             </div>
           </section>
@@ -364,9 +371,12 @@ export default function Home() {
               Get your flight reservation for as low as $10
             </div>
             <div className="flex items-center justify-center mt-4 md:mt-12">
-              <button className="py-4 px-24 font-bold rounded-lg bg-blue-700 text-white">
+              <Link
+                href="/order"
+                className="py-4 px-24 font-bold rounded-lg bg-blue-700 text-white"
+              >
                 Order Now
-              </button>
+              </Link>
             </div>
           </section>
           <section>

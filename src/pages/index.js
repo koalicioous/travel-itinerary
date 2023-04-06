@@ -176,7 +176,7 @@ export default function Home() {
                 for Visa Application. Hassle-Free with single cheap price!
               </p>
             </div>
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <Image
                 src="/hero-1.png"
                 alt="hero image"
@@ -356,7 +356,7 @@ export default function Home() {
               })}
             </div>
           </section>
-          <section className="pt-8 md:pt-32 pb-12 md:pb-24">
+          <section className="pt-8 md:pt-12 pb-12 md:pb-24">
             <div className="text-3xl md:text-4xl font-bold text-center">
               Are You Ready to Travel the World?
             </div>

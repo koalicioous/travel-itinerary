@@ -19,13 +19,13 @@ const Navbar = () => {
               </div>
               <div className="hidden md:block">
                 <div className="flex items-center gap-2">
-                  <button className="py-2 px-3 rounded text-gray-900">
+                  <button className="transition-all duration-200 py-2 px-3 rounded text-gray-900 hover:bg-gray-100">
                     Flight Reservation
                   </button>
-                  <button className="py-2 px-3 rounded text-gray-900">
+                  <button className="transition-all duration-200 py-2 px-3 rounded text-gray-900 hover:bg-gray-100">
                     About
                   </button>
-                  <button className="py-2 px-3 rounded text-gray-900">
+                  <button className="transition-all duration-200 py-2 px-3 rounded text-gray-900 hover:bg-gray-100">
                     FAQ
                   </button>
                 </div>
@@ -45,13 +45,13 @@ const Navbar = () => {
 
           <Disclosure.Panel className="md:hidden" unmount={false}>
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <button className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800">
+              <button className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800 w-full hover:text-white">
                 Flight Reservation
               </button>
-              <button className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800">
+              <button className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800  w-full hover:text-white">
                 About
               </button>
-              <button className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800">
+              <button className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800  w-full hover:text-white">
                 FAQ
               </button>
             </div>

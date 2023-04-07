@@ -3,6 +3,7 @@ import axios from "@/services/axios";
 import { useState } from "react";
 import { debounce } from "lodash";
 import { useOrderForm } from "@/context";
+import moment from "moment";
 
 const flightOptions = [
   {
@@ -26,6 +27,11 @@ const ChooseFlight = () => {
     destinationOptions,
     setDestinationOptions,
   } = useOrderForm();
+
+  const departureDate = Form.useWatch("departureDate", {
+    form,
+    preserve: true,
+  });
 
   const handleSearchOrigin = async (query) => {
     if (!query) return;
@@ -93,6 +99,12 @@ const ChooseFlight = () => {
             style={{
               marginBottom: "0px",
             }}
+            rules={[
+              {
+                required: true,
+                message: "Please select flight type",
+              },
+            ]}
           >
             <Radio.Group
               options={flightOptions}
@@ -115,6 +127,12 @@ const ChooseFlight = () => {
           style={{
             marginBottom: "0px",
           }}
+          rules={[
+            {
+              required: true,
+              message: "Please select origin",
+            },
+          ]}
         >
           <Select
             style={{
@@ -137,6 +155,12 @@ const ChooseFlight = () => {
           style={{
             marginBottom: "0px",
           }}
+          rules={[
+            {
+              required: true,
+              message: "Please select destination",
+            },
+          ]}
         >
           <Select
             style={{
@@ -159,6 +183,12 @@ const ChooseFlight = () => {
           style={{
             marginBottom: "0px",
           }}
+          rules={[
+            {
+              required: true,
+              message: "Please select departure date",
+            },
+          ]}
         >
           <DatePicker
             size="large"
@@ -167,6 +197,9 @@ const ChooseFlight = () => {
             }}
             placeholder="Departure Date"
             format={"DD MMMM YYYY"}
+            disabledDate={(current) => {
+              return current && current < moment().startOf("day");
+            }}
           />
         </Form.Item>
       </div>
@@ -178,6 +211,12 @@ const ChooseFlight = () => {
             style={{
               marginBottom: "0px",
             }}
+            rules={[
+              {
+                required: true,
+                message: "Please select return date",
+              },
+            ]}
           >
             <DatePicker
               size="large"
@@ -186,6 +225,9 @@ const ChooseFlight = () => {
               }}
               placeholder="Return Date"
               format={"DD MMMM YYYY"}
+              disabledDate={(current) => {
+                return current && current < departureDate.startOf("day");
+              }}
             />
           </Form.Item>
         </div>

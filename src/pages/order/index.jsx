@@ -18,6 +18,7 @@ import {
 import clsx from "clsx";
 import OrderFormProvider, { useOrderForm } from "@/context";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 const titleOptions = [
   {
@@ -258,21 +259,30 @@ const Order = () => {
   const handleGetOffer = async (id) => {
     setLoadingCheck(true);
     try {
-      const result = await axios.get(`/api/ticket/${id}`);
-      if (result) {
-        setLoadingCheck(false);
-        console.log(
-          result.data.data.offers.filter((offer) => {
-            return (
-              offer.payment_requirements.requires_instant_payment === false
-            );
+      const result = new Promise(async (resolve, reject) => {
+        await axios
+          .post(`/api/ticket/${id}`, {
+            email: form.getFieldValue("email"),
+            passengers: form.getFieldValue("passengers"),
           })
-        );
-      }
+          .then((res) => {
+            setLoadingCheck(false);
+            resolve(res);
+          })
+          .catch((err) => {
+            reject(err);
+          })
+          .finally(() => {
+            setLoadingCheck(false);
+          });
+      });
+      toast.promise(result, {
+        loading: "Searching available tickets",
+        success: "We found available tickets",
+        error: "Sorry, no ticket available. Try another flight.",
+      });
     } catch (err) {
       console.log(err);
-    } finally {
-      setLoadingCheck(false);
     }
   };
 
@@ -280,17 +290,29 @@ const Order = () => {
     setLoadingSubmit(true);
     try {
       const payload = generatePayload(values);
-      const result = await axios.post("/api/check-available-flights", payload);
-
-      if (result) {
-        setLoadingSubmit(false);
-        const { id } = result?.data?.data ?? {};
-        handleGetOffer(id);
-      }
+      const result = new Promise(async (resolve, reject) => {
+        await axios
+          .post("/api/check-available-flights", payload)
+          .then((res) => {
+            resolve(res);
+            setLoadingSubmit(false);
+            const { id } = res?.data?.data ?? {};
+            handleGetOffer(id);
+          })
+          .catch((err) => {
+            reject(err);
+          })
+          .finally(() => {
+            setLoadingSubmit(false);
+          });
+      });
+      toast.promise(result, {
+        loading: "Routing your flights",
+        success: "Flight route found",
+        error: "Flight route not found",
+      });
     } catch (err) {
       console.log(err);
-    } finally {
-      setLoadingSubmit(false);
     }
   };
 
@@ -489,7 +511,7 @@ const Order = () => {
                     </Checkbox>
                   </Form.Item>
                   <button
-                    className="bg-green-600 p-2 w-full text-white text-center font-bold text-sm rounded"
+                    className="bg-green-600 p-2 w-full text-white text-center font-bold text-sm rounded hover:bg-green-700"
                     onClick={validateOrderForm}
                   >
                     {loadingCheck || loadingSubmit ? (
@@ -507,7 +529,7 @@ const Order = () => {
                         </span>
                       </div>
                     ) : (
-                      <>Checkout Now ($10)</>
+                      <>Find Flight</>
                     )}
                   </button>
                 </div>

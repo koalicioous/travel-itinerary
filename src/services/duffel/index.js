@@ -1,5 +1,7 @@
 import { Duffel } from "@duffel/api";
 
+const token = process.env.DUFFEL_KEY;
+
 export const duffel = new Duffel({
-  token: "duffel_test_2ijvPX8Iq33Nw3EFW2Oo9aLOhsTcsUoSSd4qXaIGqBF",
+  token,
 });

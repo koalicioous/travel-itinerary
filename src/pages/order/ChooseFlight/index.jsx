@@ -1,7 +1,8 @@
-import { Radio, DatePicker, Select } from "antd";
+import { Radio, DatePicker, Select, Form } from "antd";
 import axios from "@/services/axios";
 import { useState } from "react";
 import { debounce } from "lodash";
+import { useOrderForm } from "@/context";
 
 const flightOptions = [
   {
@@ -17,8 +18,14 @@ const flightOptions = [
 const ChooseFlight = () => {
   const [flightType, setFlightType] = useState("one-way");
   const [loading, setLoading] = useState(false);
-  const [originOptions, setOriginOptions] = useState([]);
-  const [destinationOptions, setDestinationOptions] = useState([]);
+
+  const {
+    form,
+    originOptions,
+    setOriginOptions,
+    destinationOptions,
+    setDestinationOptions,
+  } = useOrderForm();
 
   const handleSearchOrigin = async (query) => {
     if (!query) return;
@@ -81,68 +88,106 @@ const ChooseFlight = () => {
       <div className="mb-4">
         <div className="mb-2 font-semibold">Flight Type</div>
         <div>
-          <Radio.Group
-            options={flightOptions}
-            optionType="button"
-            style={{ width: "100%" }}
-            size="large"
-            onChange={(e) => setFlightType(e.target.value)}
-            defaultValue={flightType}
-          />
+          <Form.Item
+            name="flightType"
+            style={{
+              marginBottom: "0px",
+            }}
+          >
+            <Radio.Group
+              options={flightOptions}
+              optionType="button"
+              style={{ width: "100%" }}
+              size="large"
+              onChange={(e) => {
+                setFlightType(e.target.value);
+                form.setFieldValue("returnDate", null);
+              }}
+              defaultValue={flightType}
+            />
+          </Form.Item>
         </div>
       </div>
       <div className="mb-4">
         <div className="mb-2 font-semibold">Origin</div>
-        <Select
+        <Form.Item
+          name="flightOrigin"
           style={{
-            width: "100%",
+            marginBottom: "0px",
           }}
-          loading={loading}
-          options={originOptions}
-          size="large"
-          placeholder="Origin"
-          onSearch={debounce(handleSearchOrigin, 500)}
-          showSearch
-          filterOption={false}
-        />
+        >
+          <Select
+            style={{
+              width: "100%",
+            }}
+            loading={loading}
+            options={originOptions}
+            size="large"
+            placeholder="Origin"
+            onSearch={debounce(handleSearchOrigin, 500)}
+            showSearch
+            filterOption={false}
+          />
+        </Form.Item>
       </div>
       <div className="mb-4">
         <div className="mb-2 font-semibold">Destination</div>
-        <Select
+        <Form.Item
+          name="flightDestination"
           style={{
-            width: "100%",
+            marginBottom: "0px",
           }}
-          size="large"
-          placeholder="Destination"
-          showSearch
-          filterOption={false}
-          options={destinationOptions}
-          onSearch={debounce(handleSearchDestionation, 500)}
-          loading={loading}
-        />
+        >
+          <Select
+            style={{
+              width: "100%",
+            }}
+            size="large"
+            placeholder="Destination"
+            showSearch
+            filterOption={false}
+            options={destinationOptions}
+            onSearch={debounce(handleSearchDestionation, 500)}
+            loading={loading}
+          />
+        </Form.Item>
       </div>
       <div className="mb-4">
         <div className="mb-2 font-semibold">Departure Date</div>
-        <DatePicker
-          size="large"
+        <Form.Item
+          name="departureDate"
           style={{
-            width: "100%",
+            marginBottom: "0px",
           }}
-          placeholder="Departure Date"
-          format={"DD MMMM YYYY"}
-        />
-      </div>
-      {flightType === "round-trip" && (
-        <div className="mb-4">
-          <div className="mb-2 font-semibold">Return Date</div>
+        >
           <DatePicker
             size="large"
             style={{
               width: "100%",
             }}
-            placeholder="Return Date"
+            placeholder="Departure Date"
             format={"DD MMMM YYYY"}
           />
+        </Form.Item>
+      </div>
+      {flightType === "round-trip" && (
+        <div className="mb-4">
+          <div className="mb-2 font-semibold">Return Date</div>
+          <Form.Item
+            name="returnDate"
+            style={{
+              marginBottom: "0px",
+            }}
+          >
+            <DatePicker
+              size="large"
+              style={{
+                width: "100%",
+              }}
+              placeholder="Return Date"
+              format={"DD MMMM YYYY"}
+            />
+          </Form.Item>
         </div>
       )}
     </div>

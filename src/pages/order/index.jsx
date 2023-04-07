@@ -2,14 +2,20 @@ import MainLayout from "@/layouts/main";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Select, Steps, Input, Option } from "antd";
 import Head from "next/head";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ChooseFlight from "./ChooseFlight";
 import {
   faPlaneDeparture,
   faUserEdit,
   faPassport,
   faTrash,
+  faChevronRight,
+  faChevronLeft,
+  faPlane,
+  faPerson,
 } from "@fortawesome/free-solid-svg-icons";
+import clsx from "clsx";
+import OrderFormProvider, { useOrderForm } from "@/context";
 
 const titleOptions = [
   {
@@ -36,14 +42,13 @@ const InsertPassenger = () => {
             <>
               {fields.map((field, index) => (
                 <div
-                  key={field.key}
+                  key={`${field.key}`}
                   className="flex flex-col gap-4 mb-6 md:mb-0 border-b pb-3 md:border-none md:pb-0"
                 >
                   <div className="grid grid-cols-2 md:flex gap-x-2 md:gap-4">
                     <Form.Item
                       {...field}
                       name={[field.name, "title"]}
-                      fieldKey={[field.fieldKey, "title"]}
                       className="w-full md:w-1/4 col-span-2"
                       style={{
                         marginBottom: "12px",
@@ -59,7 +64,6 @@ const InsertPassenger = () => {
                     <Form.Item
                       {...field}
                       name={[field.name, "firstName"]}
-                      fieldKey={[field.fieldKey, "firstName"]}
                       className="md:w-1/2 w-full"
                       rules={[
                         {
@@ -73,7 +77,6 @@ const InsertPassenger = () => {
                     <Form.Item
                       {...field}
                       name={[field.name, "lastName"]}
-                      fieldKey={[field.fieldKey, "lastName"]}
                       className="w-full md:w-1/2"
                       rules={[
                         {
@@ -139,8 +142,40 @@ const stepsItems = [
 ];
 
 const Order = () => {
-  const [form] = Form.useForm();
+  const { form, originOptions, destinationOptions } = useOrderForm();
+
   const [currentStep, setCurrentStep] = useState(0);
+
+  const flightType = Form.useWatch("flightType", { form, preserve: true });
+  const flightOrigin = Form.useWatch("flightOrigin", { form, preserve: true });
+  const flightDestination = Form.useWatch("flightDestination", {
+    form,
+    preserve: true,
+  });
+  const departureDate = Form.useWatch("departureDate", {
+    form,
+    preserve: true,
+  });
+  const returnDate = Form.useWatch("returnDate", { form, preserve: true });
+
+  const origin = useMemo(() => {
+    if (flightOrigin) {
+      return originOptions.find((option) => option.value === flightOrigin);
+    }
+    return null;
+  }, [flightOrigin, originOptions]);
+
+  const destination = useMemo(() => {
+    if (flightDestination) {
+      return destinationOptions.find(
+        (option) => option.value === flightDestination
+      );
+    }
+    return null;
+  }, [destinationOptions, flightDestination]);
+
+  const passengers = Form.useWatch("passengers", { form, preserve: true });
+
   return (
     <MainLayout withFooter={false}>
       <Head>
@@ -153,17 +188,158 @@ const Order = () => {
             current={currentStep}
             size="small"
             onChange={(step) => {
+              console.log(form.getFieldsValue());
               setCurrentStep(step);
             }}
           />
-          <Form form={form}>
+          <Form
+            form={form}
+            initialValues={{
+              flightType: "one-way",
+            }}
+          >
             <div className="md:mt-8">{stepsItems[currentStep].content}</div>
           </Form>
+          <div
+            className={clsx(
+              "flex items-center mt-4",
+              { "justify-end": currentStep === 0 },
+              { "justify-between": currentStep > 0 }
+            )}
+          >
+            {
+              // Show previous button if current step is not the first step
+              currentStep > 0 && (
+                <button
+                  className="py-2 px-6  text-blue-700 rounded font-semibold flex items-center"
+                  onClick={() => {
+                    setCurrentStep(currentStep - 1);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faChevronLeft} size="xs" />
+                  <span className="ml-2 pb-[1px]">Previous</span>
+                </button>
+              )
+            }
+            {currentStep < stepsItems.length - 1 && (
+              <button
+                className="py-2 px-6  text-blue-700 rounded font-semibold flex items-center"
+                onClick={() => {
+                  setCurrentStep(currentStep + 1);
+                }}
+              >
+                <span className="mr-2 pb-[1px]">Next</span>
+                <FontAwesomeIcon icon={faChevronRight} size="xs" />
+              </button>
+            )}
+          </div>
         </div>
-        <div className="w-full p-8 bg-white shadow-lg rounded-lg"></div>
+        <div className="w-full">
+          <div className="p-4 bg-white shadow-lg rounded-lg">
+            <div className=" border-b border-dashed border-gray-200 pb-4 mb-4">
+              <div className="flex items-center mb-2">
+                <FontAwesomeIcon
+                  icon={faPlane}
+                  size="xs"
+                  className="mr-2 text-gray-300"
+                />
+                <div className="text-gray-500 text-sm">Flight Details</div>
+              </div>
+              <div className="p-3 bg-gray-50 rounded">
+                {flightType && (
+                  <div className="w-full flex justify-center">
+                    {flightType === "one-way" ? (
+                      <div>One Way</div>
+                    ) : (
+                      <div>Round Trip</div>
+                    )}
+                  </div>
+                )}
+                <div className="grid grid-cols-[1fr_40px_1fr]">
+                  <div className="text-mono text-5xl text-center">
+                    {origin?.iata_code}
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <FontAwesomeIcon icon={faPlane} />
+                  </div>
+                  <div className="text-mono text-5xl text-center">
+                    {destination?.iata_code}
+                  </div>
+                </div>
+                <div></div>
+              </div>
+              <div className="mt-3">
+                <div className="text-xs font-mono text-gray-500">FROM:</div>
+                <div className="text-sm font-semibold mt-1">{origin?.name}</div>
+                <div className="text-xs">{origin?.city_name}</div>
+              </div>
+              <div className="mt-3">
+                <div className="text-xs font-mono text-gray-500">TO:</div>
+                <div className="text-sm font-semibold">{destination?.name}</div>
+                <div className="text-xs">{destination?.city_name}</div>
+              </div>
+              <div className="mt-3">
+                <div className="text-xs font-mono text-gray-500">
+                  DEPARTURE DATE:
+                </div>
+                <div className="text-sm font-semibold">
+                  {departureDate ? (
+                    <>{departureDate.format("dddd, DD MMMM YYYY")}</>
+                  ) : (
+                    <div className="text-gray-400">Not Selected</div>
+                  )}
+                </div>
+              </div>
+              {returnDate && (
+                <div className="mt-3">
+                  <div className="text-xs font-mono text-gray-500">
+                    RETURN DATE:
+                  </div>
+                  <div className="text-sm font-semibold">
+                    <>{returnDate.format("dddd, DD MMMM YYYY")}</>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center">
+              <FontAwesomeIcon
+                icon={faPerson}
+                size="xs"
+                className="mr-[14px] text-gray-300"
+              />
+              <div className="text-gray-500 text-sm">Passengers Details</div>
+            </div>
+            <div className="mt-2">
+              {passengers.map((passenger, index) => {
+                return (
+                  <div key={index} className="mb-3 flex gap-3">
+                    <div className="text-xs text-gray-400 mt-1">
+                      {index + 1}.
+                    </div>
+                    <div>
+                      {`${passenger?.title ? `${passenger.title} ` : ""}${
+                        passenger?.firstName ? `${passenger.firstName} ` : ""
+                      }${passenger?.lastName ? `${passenger.lastName}` : ""}`}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </section>
     </MainLayout>
   );
 };
 
-export default Order;
+const OrderPage = () => {
+  const [form] = Form.useForm();
+
+  return (
+    <OrderFormProvider form={form}>
+      <Order />
+    </OrderFormProvider>
+  );
+};
+
+export default OrderPage;

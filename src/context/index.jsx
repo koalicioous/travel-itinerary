@@ -1,8 +1,10 @@
 import { createContext, useContext, useState } from "react";
+import { Form } from "antd";
 
 const OrderFormContext = createContext({});
 
-const OrderFormProvider = ({ children, form }) => {
+const OrderFormProvider = ({ children }) => {
+  const [form] = Form.useForm();
   const [originOptions, setOriginOptions] = useState([]);
   const [destinationOptions, setDestinationOptions] = useState([]);
 

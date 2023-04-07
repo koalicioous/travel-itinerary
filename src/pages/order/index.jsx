@@ -1,6 +1,6 @@
 import MainLayout from "@/layouts/main";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Form, Select, Steps, Input, Option } from "antd";
+import { Form, Select, Steps, Input, Checkbox } from "antd";
 import Head from "next/head";
 import { useMemo, useState } from "react";
 import ChooseFlight from "./ChooseFlight";
@@ -33,9 +33,37 @@ const titleOptions = [
 ];
 
 const InsertPassenger = () => {
+  const { form } = useOrderForm();
   return (
     <div>
-      <div className="mb-3">Up to 5 passengers in single reservation</div>
+      <div className="mb-4">
+        <Form.Item
+          name="email"
+          rules={[
+            {
+              type: "email",
+              message: "The input is not valid E-mail!",
+            },
+            {
+              required: true,
+              message: "Please input your E-mail!",
+            },
+          ]}
+        >
+          <div className="mb-2 font-semibold">Email Address</div>
+          <Input
+            placeholder="Email"
+            size="large"
+            onChange={(e) => {
+              form.setFieldsValue({ email: e.target.value });
+            }}
+          />
+        </Form.Item>
+      </div>
+      <div className="font-semibold">Passengers List</div>
+      <div className="mb-4 text-sm text-gray-500">
+        Up to 5 passengers in single reservation
+      </div>
       <div>
         <Form.List name="passengers" initialValue={[{}]}>
           {(fields, { add, remove }) => (
@@ -106,9 +134,9 @@ const InsertPassenger = () => {
                 <button
                   type="button"
                   onClick={() => add()}
-                  className="rounded py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 w-full"
+                  className="rounded py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 w-full font-bold"
                 >
-                  Add Passenger
+                  + Add Passenger
                 </button>
               )}
             </>
@@ -134,11 +162,11 @@ const stepsItems = [
     content: <InsertPassenger />,
     icon: <FontAwesomeIcon icon={faUserEdit} size="xs" />,
   },
-  {
-    title: "Review Order",
-    content: <ReviewOrder />,
-    icon: <FontAwesomeIcon icon={faPassport} size="xs" />,
-  },
+  //   {
+  //     title: "Review Order",
+  //     content: <ReviewOrder />,
+  //     icon: <FontAwesomeIcon icon={faPassport} size="xs" />,
+  //   },
 ];
 
 const Order = () => {
@@ -183,26 +211,43 @@ const Order = () => {
       </Head>
       <section className="my-8 grid grid-cols-1 md:grid-cols-3 gap-y-3 md:gap-8">
         <div className="col-span-2">
-          <Steps
-            items={stepsItems}
-            current={currentStep}
-            size="small"
-            onChange={(step) => {
-              console.log(form.getFieldsValue());
-              setCurrentStep(step);
-            }}
-          />
           <Form
             form={form}
             initialValues={{
               flightType: "one-way",
             }}
+            onValuesChange={(changedValues, allValues) => {
+              console.log(changedValues, allValues);
+            }}
           >
-            <div className="md:mt-8">{stepsItems[currentStep].content}</div>
+            <Steps
+              items={stepsItems}
+              current={currentStep}
+              size="small"
+              onChange={(step) => {
+                setCurrentStep(step);
+              }}
+            />
+            <div className="mt-4">
+              <div
+                className={clsx({
+                  hidden: currentStep !== 0,
+                })}
+              >
+                <ChooseFlight />
+              </div>
+              <div
+                className={clsx({
+                  hidden: currentStep !== 1,
+                })}
+              >
+                <InsertPassenger />
+              </div>
+            </div>
           </Form>
           <div
             className={clsx(
-              "flex items-center mt-4",
+              "items-center mt-4 hidden sm:flex",
               { "justify-end": currentStep === 0 },
               { "justify-between": currentStep > 0 }
             )}
@@ -309,8 +354,8 @@ const Order = () => {
               />
               <div className="text-gray-500 text-sm">Passengers Details</div>
             </div>
-            <div className="mt-2">
-              {passengers.map((passenger, index) => {
+            <div className="mt-2 border-b border-dashed">
+              {passengers?.map((passenger, index) => {
                 return (
                   <div key={index} className="mb-3 flex gap-3">
                     <div className="text-xs text-gray-400 mt-1">
@@ -325,6 +370,27 @@ const Order = () => {
                 );
               })}
             </div>
+            {currentStep === stepsItems.length - 1 && (
+              <div className="mt-2">
+                <Form.Item
+                  style={{
+                    marginBottom: "4px",
+                  }}
+                >
+                  <Checkbox className="text-sm">
+                    I agree to the <a href="#">Terms and Conditions</a>
+                  </Checkbox>
+                </Form.Item>
+                <button
+                  className="bg-green-600 p-2 w-full text-white text-center font-bold text-sm rounded"
+                  onClick={() => {
+                    console.log(form.getFieldsValue());
+                  }}
+                >
+                  Checkout Now ($10)
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -333,10 +399,8 @@ const Order = () => {
 };
 
 const OrderPage = () => {
-  const [form] = Form.useForm();
-
   return (
-    <OrderFormProvider form={form}>
+    <OrderFormProvider>
       <Order />
     </OrderFormProvider>
   );

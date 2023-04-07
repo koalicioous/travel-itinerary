@@ -1,89 +1,15 @@
 import MainLayout from "@/layouts/main";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { DatePicker, Form, Radio, Select, Steps, Input, Option } from "antd";
+import { Form, Select, Steps, Input, Option } from "antd";
 import Head from "next/head";
 import { useState } from "react";
+import ChooseFlight from "./ChooseFlight";
 import {
   faPlaneDeparture,
   faUserEdit,
   faPassport,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-
-const flightOptions = [
-  {
-    value: "one-way",
-    label: "One Way",
-  },
-  {
-    value: "round-trip",
-    label: "Round Trip",
-  },
-];
-const ChooseFlight = () => {
-  const [flightType, setFlightType] = useState("one-way");
-  return (
-    <div>
-      <div className="mb-4">
-        <div className="mb-2 font-semibold">Flight Type</div>
-        <div>
-          <Radio.Group
-            options={flightOptions}
-            optionType="button"
-            style={{ width: "100%" }}
-            size="large"
-            onChange={(e) => setFlightType(e.target.value)}
-            defaultValue={flightType}
-          />
-        </div>
-      </div>
-      <div className="mb-4">
-        <div className="mb-2 font-semibold">Origin</div>
-        <Select
-          style={{
-            width: "100%",
-          }}
-          size="large"
-          placeholder="Origin"
-        />
-      </div>
-      <div className="mb-4">
-        <div className="mb-2 font-semibold">Destination</div>
-        <Select
-          style={{
-            width: "100%",
-          }}
-          size="large"
-          placeholder="Destination"
-        />
-      </div>
-      <div className="mb-4">
-        <div className="mb-2 font-semibold">Departure Date</div>
-        <DatePicker
-          size="large"
-          style={{
-            width: "100%",
-          }}
-          placeholder="Departure Date"
-          format={"DD MMMM YYYY"}
-        />
-      </div>
-      {flightType === "round-trip" && (
-        <div className="mb-4">
-          <div className="mb-2 font-semibold">Return Date</div>
-          <DatePicker
-            size="large"
-            style={{
-              width: "100%",
-            }}
-            placeholder="Return Date"
-            format={"DD MMMM YYYY"}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
 
 const titleOptions = [
   {
@@ -234,7 +160,7 @@ const Order = () => {
             <div className="md:mt-8">{stepsItems[currentStep].content}</div>
           </Form>
         </div>
-        <div className="w-full p-8 bg-gray-500 rounded-lg"></div>
+        <div className="w-full p-8 bg-white shadow-lg rounded-lg"></div>
       </section>
     </MainLayout>
   );

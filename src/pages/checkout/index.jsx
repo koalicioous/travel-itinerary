@@ -14,11 +14,13 @@ import {
 } from "@/utils/helpers";
 import { Timeline } from "antd";
 import clsx from "clsx";
+import {
+  PayPalScriptProvider,
+  PayPalButtons,
+  FUNDING,
+} from "@paypal/react-paypal-js";
 
 const FlightSegment = ({ segment, nextFlight = null, type = "departure" }) => {
-  //   console.log("segment", segment);
-  //   console.log("nextFlight", nextFlight);
-
   const flightDuration = formatDuration(
     calculateDuration(segment.departing_at, segment.arriving_at)
   );
@@ -201,9 +203,9 @@ const FlightSlice = ({ route, idx }) => {
 };
 
 const FlightDetail = ({ order }) => {
-  //   console.log(order);
+  // console.log(order);
   return (
-    <div className="py-4 rounded-lg">
+    <div className="py-4">
       <div className="font-semibold text-lg mb-4">Journey details</div>
       {order.routes.map((route, idx) => {
         return <FlightSlice key={route.id} route={route} idx={idx} />;
@@ -246,6 +248,15 @@ const CheckoutPage = () => {
     }
   }, [orderId]);
 
+  const createPayPalOrder = async () => {
+    // const response = await createMutation.mutateAsync({})
+    // return response.data.orderID
+  };
+
+  const onApprove = async (data) => {
+    // return captureMutation.mutate({ orderID: data.orderID })
+  };
+
   return (
     <>
       <Head>
@@ -258,7 +269,74 @@ const CheckoutPage = () => {
             Retrieving your order detail
           </div>
         ) : (
-          <>{order && <FlightDetail order={order} />}</>
+          <>
+            {order && <FlightDetail order={order} />}
+            {order?.passengers && (
+              <>
+                <div className=" border-b border-dashed pb-4">
+                  <div className="font-semibold text-lg mb-4">
+                    Passengers detail
+                  </div>
+                  <div className="text-lg">
+                    {order?.passengers.map((passenger, idx) => {
+                      console.log(passenger);
+                      return (
+                        <div key={passenger.id}>
+                          {`${idx + 1}. ${passenger.title} ${
+                            passenger.firstName
+                          } ${passenger.lastName}`}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+            <div className="mt-2 mx-auto text-center">
+              <div className="flex items-center justify-between mb-4">
+                <div className="font-semibold text-lg flex items-center">
+                  Total:
+                </div>
+                <div className="text-2xl font-semibold  flex items-center">
+                  $10
+                </div>
+              </div>
+              <div className="text-sm mb-4 text-gray-600">
+                After you completed the payment, you will be able to directly
+                download your e-ticket reservation including your airline
+                booking reference
+              </div>
+              <PayPalScriptProvider
+                options={{
+                  "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+                  currency: "USD",
+                }}
+              >
+                <PayPalButtons
+                  style={{
+                    color: "gold",
+                    shape: "rect",
+                    label: "pay",
+                    height: 50,
+                  }}
+                  fundingSource={FUNDING.PAYPAL}
+                  createOrder={createPayPalOrder}
+                  onApprove={onApprove}
+                />
+                <PayPalButtons
+                  style={{
+                    color: "black",
+                    shape: "rect",
+                    label: "pay",
+                    height: 50,
+                  }}
+                  fundingSource={FUNDING.CARD}
+                  createOrder={createPayPalOrder}
+                  onApprove={onApprove}
+                />
+              </PayPalScriptProvider>
+            </div>
+          </>
         )}
       </MainLayout>
     </>

@@ -251,7 +251,7 @@ const Order = () => {
 
     const payload = {
       return_offers: true,
-      supplier_timeout: 10000,
+      supplier_timeout: 20000,
       slices,
       passengers,
     };
@@ -291,7 +291,9 @@ const Order = () => {
         error: "Sorry, no ticket available. Try another flight.",
       });
     } catch (err) {
-      console.log(err);
+      if ((err.code = "offer_no_longer_available")) {
+      }
+      console.error(err);
     }
   };
 

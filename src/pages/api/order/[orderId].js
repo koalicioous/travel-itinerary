@@ -14,5 +14,6 @@ export default async function handler(req, res) {
   res.status(200).json({
     airline: owner,
     routes: slices,
+    passengers: result.data[0].passengers,
   });
 }

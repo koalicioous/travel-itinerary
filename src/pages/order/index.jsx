@@ -19,6 +19,7 @@ import clsx from "clsx";
 import OrderFormProvider, { useOrderForm } from "@/context";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/router";
 
 const titleOptions = [
   {
@@ -77,7 +78,7 @@ const InsertPassenger = () => {
                   className="flex flex-col gap-4 mb-6 md:mb-0 border-b pb-3 md:border-none md:pb-0"
                 >
                   <div className="grid grid-cols-2 md:flex gap-x-2 md:gap-4">
-                    {/* <Form.Item
+                    <Form.Item
                       {...field}
                       name={[field.name, "title"]}
                       className="w-full md:w-1/4 col-span-2"
@@ -97,7 +98,7 @@ const InsertPassenger = () => {
                         allowClear
                         options={titleOptions}
                       />
-                    </Form.Item> */}
+                    </Form.Item>
                     <Form.Item
                       {...field}
                       name={[field.name, "firstName"]}
@@ -188,6 +189,7 @@ const stepsItems = [
 
 const Order = () => {
   const { form, originOptions, destinationOptions } = useOrderForm();
+  const router = useRouter();
 
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -229,6 +231,7 @@ const Order = () => {
     const passengers = values.passengers.map((passenger) => ({
       family_name: passenger.lastName,
       given_name: passenger.firstName,
+      title: passenger.title,
       type: "adult",
     }));
 
@@ -247,7 +250,7 @@ const Order = () => {
     }
 
     const payload = {
-      return_offers: false,
+      return_offers: true,
       supplier_timeout: 10000,
       slices,
       passengers,
@@ -256,17 +259,23 @@ const Order = () => {
     return payload;
   };
 
-  const handleGetOffer = async (id) => {
+  const handleGetOffer = async (id, passengers) => {
     setLoadingCheck(true);
     try {
       const result = new Promise(async (resolve, reject) => {
+        const passengerForm = form.getFieldValue("passengers");
+        const mergedPassengers = passengerForm.map((passenger, index) => ({
+          ...passenger,
+          ...passengers[index],
+        }));
         await axios
           .post(`/api/ticket/${id}`, {
             email: form.getFieldValue("email"),
-            passengers: form.getFieldValue("passengers"),
+            passengers: mergedPassengers,
           })
           .then((res) => {
             setLoadingCheck(false);
+            router.push(`/checkout?orderId=${res?.data?.data?.data?.id}`);
             resolve(res);
           })
           .catch((err) => {
@@ -296,8 +305,8 @@ const Order = () => {
           .then((res) => {
             resolve(res);
             setLoadingSubmit(false);
-            const { id } = res?.data?.data ?? {};
-            handleGetOffer(id);
+            const { id, passengers } = res?.data?.data ?? {};
+            handleGetOffer(id, passengers);
           })
           .catch((err) => {
             reject(err);

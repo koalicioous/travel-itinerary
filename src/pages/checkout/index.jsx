@@ -27,13 +27,13 @@ const FlightSegment = ({ segment, nextFlight = null, type = "departure" }) => {
 
   return (
     <div className="ml-3">
-      <div className="flex items-center gap-3">
-        <div className="text-xl font-semibold">
+      <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3">
+        <div className="text-lg md:text-xl font-semibold">
           {moment(
             type === "departure" ? segment.departing_at : segment.arriving_at
           ).format("ddd, DD MMM YYYY, HH:mm")}
         </div>
-        <div className="text-xl">
+        <div className="text-sm md:text-xl text-gray-500">
           {type === "departure" ? (
             <span>
               {`Departing from ${segment.origin.name} (${segment.origin.iata_code})`}
@@ -46,12 +46,12 @@ const FlightSegment = ({ segment, nextFlight = null, type = "departure" }) => {
         </div>
       </div>
       {type === "departure" && (
-        <div className="mt-2 text-lg text-gray-500">
+        <div className="mt-2 text-sm md:text-lg text-gray-500">
           Flight Duration: {flightDuration}
         </div>
       )}
       {type === "arrival" && (
-        <div className="flex items-center gap-3 mt-2">
+        <div className="grid grid-cols-2 md:flex flex-col items-start md:flex-row md:items-center gap-2 md:gap-3 mt-2">
           <div>{cabin.cabin_class_marketing_name}</div>
           <div>{segment.operating_carrier.name}</div>
           <div>{segment.aircraft.name}</div>
@@ -59,7 +59,7 @@ const FlightSegment = ({ segment, nextFlight = null, type = "departure" }) => {
             {segment.marketing_carrier.iata_code}{" "}
             {segment.marketing_carrier_flight_number}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 col-span-2">
             <FontAwesomeIcon icon={faLuggageCart} />
             <div>{cabin.baggages[0].quantity} checked baggage</div>
           </div>
@@ -111,7 +111,7 @@ const FlightSlice = ({ route, idx }) => {
 
   return (
     <div className=" mb-4 border-b border-dashed">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
         <div className="flex items-center gap-4">
           <Image
             src={route.segments[0].operating_carrier.logo_symbol_url}
@@ -124,12 +124,12 @@ const FlightSlice = ({ route, idx }) => {
               {journeyTime.departure.format("HH:mm")} -{" "}
               {journeyTime.arrival.format("HH:mm")}
             </div>
-            <div>
+            <div className="text-xs md:text-base">
               {jointOperation ? routeSubtitle : toTitleCase(cabinClass)}
             </div>
           </div>
         </div>
-        <div className="flex gap-8">
+        <div className="flex gap-8 mt-2 md:mt-0 pl-12 md:pl-0">
           <div>
             <div className="text-lg font-semibold">{totalJourneyDuration}</div>
             <div>
@@ -188,7 +188,7 @@ const FlightSlice = ({ route, idx }) => {
             </Timeline>
             {nextFlight && (
               <div className="-mt-2 mb-8">
-                <div className="py-1 px-4 rounded-full bg-gray-200 text-gray-700 text-sm inline-block">
+                <div className="py-1 px-4 rounded md:rounded-full bg-gray-200 text-gray-700 text-xs md:text-sm inline-block text-center">
                   {`${layoverDuration} layover at ${segment.destination.name}`}
                 </div>
               </div>

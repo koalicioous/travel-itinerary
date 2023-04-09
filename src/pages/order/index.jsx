@@ -753,60 +753,58 @@ const Order = () => {
             )
           )}
 
-          {smallView && (
-            <div className="fixed bottom-0 left-0 w-full bg-white border-t grid grid-cols-3">
-              <button
-                type="button"
-                className="flex items-center justify-center gap-2 p-4 border-r"
-                onClick={() => {
-                  setCurrentStep(0);
-                }}
+          <div className="fixed bottom-0 left-0 w-full bg-white border-t grid grid-cols-3 md:hidden">
+            <button
+              type="button"
+              className="flex items-center justify-center gap-2 p-4 border-r"
+              onClick={() => {
+                setCurrentStep(0);
+              }}
+            >
+              {/* <FontAwesomeIcon icon={faPlane} /> */}
+              <span
+                className={clsx("text-sm", {
+                  "text-blue-500 font-semibold": currentStep === 0,
+                })}
               >
-                {/* <FontAwesomeIcon icon={faPlane} /> */}
-                <span
-                  className={clsx("text-sm", {
-                    "text-blue-500 font-semibold": currentStep === 0,
-                  })}
-                >
-                  Flight
-                </span>
-                {/* <FontAwesomeIcon icon={faCheckCircle} size="xs" /> */}
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center gap-2 p-4 border-r"
-                onClick={() => {
-                  setCurrentStep(1);
-                }}
+                Flight
+              </span>
+              {/* <FontAwesomeIcon icon={faCheckCircle} size="xs" /> */}
+            </button>
+            <button
+              type="button"
+              className="flex items-center justify-center gap-2 p-4 border-r"
+              onClick={() => {
+                setCurrentStep(1);
+              }}
+            >
+              {/* <FontAwesomeIcon icon={faUserEdit} /> */}
+              <span
+                className={clsx("text-sm", {
+                  "text-blue-500 font-semibold": currentStep === 1,
+                })}
               >
-                {/* <FontAwesomeIcon icon={faUserEdit} /> */}
-                <span
-                  className={clsx("text-sm", {
-                    "text-blue-500 font-semibold": currentStep === 1,
-                  })}
-                >
-                  Passengers
-                </span>
-                {/* <FontAwesomeIcon icon={faCheckCircle} size="xs" /> */}
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center gap-1 p-4"
-                onClick={() => {
-                  setCurrentStep(99);
-                }}
+                Passengers
+              </span>
+              {/* <FontAwesomeIcon icon={faCheckCircle} size="xs" /> */}
+            </button>
+            <button
+              type="button"
+              className="flex items-center justify-center gap-1 p-4"
+              onClick={() => {
+                setCurrentStep(99);
+              }}
+            >
+              <span
+                className={clsx("text-sm", {
+                  "text-blue-500 font-semibold": currentStep === 99,
+                })}
               >
-                <span
-                  className={clsx("text-sm", {
-                    "text-blue-500 font-semibold": currentStep === 99,
-                  })}
-                >
-                  Review
-                </span>
-                {/* <FontAwesomeIcon icon={faReceipt} /> */}
-              </button>
-            </div>
-          )}
+                Review
+              </span>
+              {/* <FontAwesomeIcon icon={faReceipt} /> */}
+            </button>
+          </div>
         </section>
       </Form>
     </MainLayout>

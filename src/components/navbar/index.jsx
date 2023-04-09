@@ -28,12 +28,12 @@ const Navbar = () => {
                   >
                     Flight Reservation
                   </Link>
-                  <button className="transition-all duration-200 py-2 px-3 rounded text-gray-900 hover:bg-gray-100">
-                    About
-                  </button>
-                  <button className="transition-all duration-200 py-2 px-3 rounded text-gray-900 hover:bg-gray-100">
+                  <Link
+                    href="#faq"
+                    className="transition-all duration-200 py-2 px-3 rounded text-gray-900 hover:bg-gray-100"
+                  >
                     FAQ
-                  </button>
+                  </Link>
                 </div>
               </div>
               <div className="-mr-2 flex md:hidden">
@@ -57,12 +57,12 @@ const Navbar = () => {
               >
                 Flight Reservation
               </Link>
-              <button className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800  w-full hover:text-white">
-                About
-              </button>
-              <button className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800  w-full hover:text-white">
+              <Link
+                href="#faq"
+                className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800  w-full hover:text-white"
+              >
                 FAQ
-              </button>
+              </Link>
             </div>
           </Disclosure.Panel>
         </>

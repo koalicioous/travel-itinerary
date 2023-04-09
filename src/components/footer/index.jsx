@@ -10,22 +10,22 @@ const Footer = () => {
           </span>
         </Link>
 
-        <Link href="/privacy">
+        {/* <Link href="/privacy">
           <span className="text-gray-400 hover:text-gray-300">
             Privacy Policy
           </span>
-        </Link>
+        </Link> */}
 
         <Link href="/contacts">
           <span className="text-gray-400 hover:text-gray-300">Contacts</span>
         </Link>
 
-        <Link href="/about">
+        {/* <Link href="/about">
           <span className="text-gray-400 hover:text-gray-300">About</span>
-        </Link>
+        </Link> */}
       </div>
       <div className="mt-4 md:mt-0">
-        &copy; 2023 Easy Flight. All rights reserved.
+        &copy; {new Date().getFullYear()} Easy Flight. All rights reserved.
       </div>
     </footer>
   );

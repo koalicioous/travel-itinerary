@@ -1,8 +1,15 @@
+import { updateOrder } from "@/services/OrderService";
 import client from "@/services/paypal";
 import paypal from "@paypal/checkout-server-sdk";
 
 export default async function handle(req, res) {
   const PaypalClient = client();
+  const { orderId } = req.body;
+
+  if (!orderId) {
+    res.status(400).json({ message: "Bad request" });
+  }
+
   //This code is lifted from https://github.com/paypal/Checkout-NodeJS-SDK
   const request = new paypal.orders.OrdersCreateRequest();
   request.headers["prefer"] = "return=representation";
@@ -11,8 +18,8 @@ export default async function handle(req, res) {
     purchase_units: [
       {
         amount: {
-          currency_code: "PHP",
-          value: "100.00",
+          currency_code: "USD",
+          value: "10.00",
         },
       },
     ],
@@ -22,12 +29,11 @@ export default async function handle(req, res) {
     res.status(500);
   }
 
-  //Once order is created store the data using Prisma
-  await prisma.payment.create({
-    data: {
-      orderID: response.result.id,
-      status: "PENDING",
-    },
+  await updateOrder({
+    orderId,
+    status: "PENDING",
+    paypalId: response.result.id,
   });
+
   res.json({ orderID: response.result.id });
 }

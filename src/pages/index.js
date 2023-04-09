@@ -162,7 +162,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
+      <main className="">
         <MainLayout>
           <section className="pb-4 md:pb-8 pt-4 md:pt-12 flex items-center">
             <div>
@@ -379,7 +379,7 @@ export default function Home() {
               </Link>
             </div>
           </section>
-          <section>
+          <section id="faq">
             <div className="text-3xl md:text-4xl font-bold text-center mb-6">
               Frequently Asked Questions
             </div>

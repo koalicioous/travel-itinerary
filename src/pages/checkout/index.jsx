@@ -19,6 +19,7 @@ import {
   PayPalButtons,
   FUNDING,
 } from "@paypal/react-paypal-js";
+import { toast } from "react-hot-toast";
 
 const FlightSegment = ({ segment, nextFlight = null, type = "departure" }) => {
   const flightDuration = formatDuration(
@@ -202,7 +203,7 @@ const FlightSlice = ({ route, idx }) => {
   );
 };
 
-const FlightDetail = ({ order }) => {
+export const FlightDetail = ({ order }) => {
   // console.log(order);
   return (
     <div className="py-4">
@@ -219,6 +220,7 @@ const CheckoutPage = () => {
   const { orderId } = router.query;
   const [retrieveOrderLoading, setRetrieveOrderLoading] = useState(false);
   const [order, setOrder] = useState(null);
+  const [paypalOrder, setPaypalOrder] = useState(null);
 
   useEffect(() => {
     if (router.isReady) {
@@ -236,9 +238,50 @@ const CheckoutPage = () => {
         setOrder(result.data);
       }
     } catch (err) {
-      console.error(err);
+      toast.error("Invalid order");
+      router.push("/");
     } finally {
       setRetrieveOrderLoading(false);
+    }
+  };
+
+  const createPayPalOrder = async () => {
+    const process = new Promise(async (resolve, reject) => {
+      try {
+        const response = await axios.post("/api/paypal/create-order", {
+          orderId,
+        });
+        if (response.data) {
+          resolve(response.data.orderID);
+          if (document) {
+            window.scrollTo(0, document.body.scrollHeight);
+          }
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
+
+    toast.promise(process, {
+      loading: "Creating order...",
+      success: "Successfully created order",
+      error: "Failed to create order",
+    });
+    return process;
+  };
+
+  const onApprove = async (data) => {
+    try {
+      const result = await axios.post("/api/paypal/capture-order", {
+        orderId,
+        paypalId: data.orderID,
+      });
+      if (result.data) {
+        toast.success("Payment success");
+        router.push(`/success?orderId=${orderId}`);
+      }
+    } catch (err) {
+      toast.error(err.message);
     }
   };
 
@@ -247,15 +290,6 @@ const CheckoutPage = () => {
       retrieveOrder(orderId);
     }
   }, [orderId]);
-
-  const createPayPalOrder = async () => {
-    // const response = await createMutation.mutateAsync({})
-    // return response.data.orderID
-  };
-
-  const onApprove = async (data) => {
-    // return captureMutation.mutate({ orderID: data.orderID })
-  };
 
   return (
     <>
@@ -279,7 +313,6 @@ const CheckoutPage = () => {
                   </div>
                   <div className="text-lg">
                     {order?.passengers.map((passenger, idx) => {
-                      console.log(passenger);
                       return (
                         <div key={passenger.id}>
                           {`${idx + 1}. ${passenger.title} ${
@@ -290,52 +323,56 @@ const CheckoutPage = () => {
                     })}
                   </div>
                 </div>
+                <div className="mt-2 mx-auto text-center">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="font-semibold text-lg flex items-center">
+                      Total:
+                    </div>
+                    <div className="text-2xl font-semibold  flex items-center">
+                      $10
+                    </div>
+                  </div>
+                  <div className="text-sm mb-4 text-gray-600">
+                    After you completed the payment, you will be able to
+                    directly download your e-ticket reservation including your
+                    airline booking reference
+                  </div>
+                  <PayPalScriptProvider
+                    options={{
+                      "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+                      currency: "USD",
+                    }}
+                  >
+                    <PayPalButtons
+                      style={{
+                        color: "gold",
+                        shape: "rect",
+                        label: "pay",
+                        height: 50,
+                      }}
+                      fundingSource={FUNDING.PAYPAL}
+                      createOrder={createPayPalOrder}
+                      onApprove={onApprove}
+                    />
+                    <PayPalButtons
+                      style={{
+                        color: "black",
+                        shape: "rect",
+                        label: "pay",
+                        height: 50,
+                      }}
+                      fundingSource={FUNDING.CARD}
+                      createOrder={createPayPalOrder}
+                      onApprove={onApprove}
+                      onError={() => {
+                        toast.error("Payment failed");
+                      }}
+                      tagline={true}
+                    />
+                  </PayPalScriptProvider>
+                </div>
               </>
             )}
-            <div className="mt-2 mx-auto text-center">
-              <div className="flex items-center justify-between mb-4">
-                <div className="font-semibold text-lg flex items-center">
-                  Total:
-                </div>
-                <div className="text-2xl font-semibold  flex items-center">
-                  $10
-                </div>
-              </div>
-              <div className="text-sm mb-4 text-gray-600">
-                After you completed the payment, you will be able to directly
-                download your e-ticket reservation including your airline
-                booking reference
-              </div>
-              <PayPalScriptProvider
-                options={{
-                  "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
-                  currency: "USD",
-                }}
-              >
-                <PayPalButtons
-                  style={{
-                    color: "gold",
-                    shape: "rect",
-                    label: "pay",
-                    height: 50,
-                  }}
-                  fundingSource={FUNDING.PAYPAL}
-                  createOrder={createPayPalOrder}
-                  onApprove={onApprove}
-                />
-                <PayPalButtons
-                  style={{
-                    color: "black",
-                    shape: "rect",
-                    label: "pay",
-                    height: 50,
-                  }}
-                  fundingSource={FUNDING.CARD}
-                  createOrder={createPayPalOrder}
-                  onApprove={onApprove}
-                />
-              </PayPalScriptProvider>
-            </div>
           </>
         )}
       </MainLayout>

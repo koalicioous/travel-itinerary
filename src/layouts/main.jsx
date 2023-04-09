@@ -5,7 +5,7 @@ const MainLayout = ({ children, withFooter = true }) => {
   return (
     <>
       <Navbar />
-      <div className="mx-auto max-w-[1024px] mb-12 px-6 lg:px-0">
+      <div className="mx-auto max-w-[1024px] mb-12 px-6 lg:px-0 scroll-smooth">
         {children}
       </div>
       {withFooter && <Footer />}

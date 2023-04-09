@@ -22,8 +22,7 @@ import OrderFormProvider, { useOrderForm } from "@/context";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
-import dynamic from "next/dynamic";
-const useViewportWidth = dynamic(() => import("@/hooks/useViewportWidth"));
+import useViewportWidth from "@/hooks/useViewportWidth";
 
 const titleOptions = [
   {

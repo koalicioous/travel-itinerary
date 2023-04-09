@@ -66,45 +66,40 @@ const questions = [
     question:
       "Is your service legitimate and will the reservations be accepted by the embassy?",
     answer:
-      "Yes, our service is legitimate and our verified flight reservations are accepted by embassies and consulates worldwide. We take the verification process seriously and ensure that all reservations meet embassy requirements and are fully verified with the airline.",
+      "Yes, our service is legitimate and our verified flight reservations are verifiable through airlines website by the time you recieved the booking confirmation from us.",
   },
   {
     question: "How much does it cost to use your travel document service?",
     answer:
-      "The cost of our travel document service depends on the type of document you need and the options you choose. We offer competitive pricing and a range of affordable options to meet your needs. Please visit our website for more information on pricing.",
+      "We provide a single price ($10) for all kind of flight that you search through our platform.",
   },
   {
     question: "How fast can I get my reservation once I make a payment?",
     answer:
-      "Once you make a payment, you can typically download your reservation instantly. In some cases, it may take up to a few hours to receive your reservation. We offer instant download options for most of our services.",
+      "Once you make a payment, you can download your reservation instantly. Should you face any problem in downloading your itinerary, please contact us for help.",
   },
   {
     question:
       "What airlines do you work with for the verified flight reservations?",
     answer:
-      "We work with a variety of airlines to provide verified flight reservations. Our team is familiar with embassy requirements and can help you select the best airline for your needs.",
+      "We work with a variety of airlines to provide verified flight reservations.",
   },
   {
     question:
       "What types of payment do you accept for your travel document service?",
     answer:
-      "We accept multiple forms of payment for our travel document service, including credit cards and PayPal. Please visit our website for more information on payment options.",
+      "We accept multiple forms of payment for our travel document service, including credit cards and PayPal.",
   },
   {
     question: "Can I make changes to my reservation after I receive it?",
     answer:
-      "Depending on the airline, changes to your reservation may be possible. Please contact our customer support team for assistance with making changes to your reservation.",
+      "Unfortunately, no. But you can always create new order to revise your reservation",
   },
   {
     question:
       "Do you offer any guarantees or refunds for your travel document service?",
     answer:
-      "We stand behind the quality of our service and offer a satisfaction guarantee. If for any reason you are not satisfied with our travel document service, we offer a full refund within a certain timeframe. Please see our website for more information on our refund policy.",
-  },
-  {
-    question: "How secure is your website and payment process?",
-    answer:
-      "We take website and payment security seriously and use industry-standard security measures to protect your information. Our website uses SSL encryption to ensure that your data is safe and secure during transmission. We also use secure payment gateways to process all payments.",
+      "We stand behind the quality of our service and offer a satisfaction guarantee. If for any reason you are not satisfied with our travel document service, we offer a full refund within a certain timeframe. Please contact us to discuss the refund process.",
   },
 ];
 
@@ -193,9 +188,14 @@ export default function Home() {
             >
               Order Now ($10)
             </Link>
-            <button className="py-4 px-4 rounded-lg w-full md:w-auto">
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="/example-itinerary.pdf"
+              className="py-4 px-4 rounded-lg w-full md:w-auto"
+            >
               See a Preview &#8594;
-            </button>
+            </a>
           </section>
           <section className="py-8 md:py-16 flex flex-col md:flex-row items-center justify-between gap-4">
             {keyFeatures.map((feature) => {

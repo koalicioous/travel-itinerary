@@ -29,7 +29,7 @@ const Navbar = () => {
                     Flight Reservation
                   </Link>
                   <Link
-                    href="#faq"
+                    href="/#faq"
                     className="transition-all duration-200 py-2 px-3 rounded text-gray-900 hover:bg-gray-100"
                   >
                     FAQ
@@ -58,7 +58,7 @@ const Navbar = () => {
                 Flight Reservation
               </Link>
               <Link
-                href="#faq"
+                href="/#faq"
                 className="block py-2 px-3 rounded text-base font-medium text-gray-900 hover:bg-gray-800  w-full hover:text-white"
               >
                 FAQ

@@ -16,7 +16,7 @@ const Footer = () => {
           </span>
         </Link> */}
 
-        <Link href="/contacts">
+        <Link href="/contact">
           <span className="text-gray-400 hover:text-gray-300">Contacts</span>
         </Link>
 

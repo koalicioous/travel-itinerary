@@ -197,6 +197,11 @@ const ChooseFlight = () => {
             }}
             placeholder="Departure Date"
             format={"DD MMMM YYYY"}
+            onChange={() => {
+              if (flightType === "round-trip") {
+                form.setFieldValue("returnDate", null);
+              }
+            }}
             disabledDate={(current) => {
               return current && current < moment().startOf("day");
             }}
@@ -225,9 +230,11 @@ const ChooseFlight = () => {
               }}
               placeholder="Return Date"
               format={"DD MMMM YYYY"}
-              disabledDate={(current) => {
-                return current && current < departureDate.startOf("day");
-              }}
+              {...(departureDate && {
+                disabledDate: (current) => {
+                  return current && current < departureDate.startOf("day");
+                },
+              })}
             />
           </Form.Item>
         </div>

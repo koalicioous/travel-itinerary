@@ -449,9 +449,149 @@ const Order = () => {
             </div>
           </div>
 
-          {!smallView ? (
-            <div className="hidden md:block w-full mb-6">
-              <div className="p-4 bg-white shadow-lg rounded-lg">
+          <div className="hidden md:block w-full mb-6">
+            <div className="p-4 bg-white shadow-lg rounded-lg">
+              <div className=" border-b border-dashed border-gray-200 pb-4 mb-4">
+                <div className="flex items-center mb-2">
+                  <FontAwesomeIcon
+                    icon={faPlane}
+                    size="xs"
+                    className="mr-2 text-gray-300"
+                  />
+                  <div className="text-gray-500 text-sm">Flight Details</div>
+                </div>
+                <div className="p-3 bg-gray-50 rounded">
+                  {flightType && (
+                    <div className="w-full flex justify-center">
+                      {flightType === "one-way" ? (
+                        <div>One Way</div>
+                      ) : (
+                        <div>Round Trip</div>
+                      )}
+                    </div>
+                  )}
+                  <div className="grid grid-cols-[1fr_40px_1fr]">
+                    <div className="text-mono text-5xl text-center">
+                      {origin?.iata_code}
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <FontAwesomeIcon icon={faPlane} />
+                    </div>
+                    <div className="text-mono text-5xl text-center">
+                      {destination?.iata_code}
+                    </div>
+                  </div>
+                  <div></div>
+                </div>
+                <div className="mt-3">
+                  <div className="text-xs font-mono text-gray-500">FROM:</div>
+                  <div className="text-sm font-semibold mt-1">
+                    {origin?.name}
+                  </div>
+                  <div className="text-xs">{origin?.city_name}</div>
+                </div>
+                <div className="mt-3">
+                  <div className="text-xs font-mono text-gray-500">TO:</div>
+                  <div className="text-sm font-semibold">
+                    {destination?.name}
+                  </div>
+                  <div className="text-xs">{destination?.city_name}</div>
+                </div>
+                <div className="mt-3">
+                  <div className="text-xs font-mono text-gray-500">
+                    DEPARTURE DATE:
+                  </div>
+                  <div className="text-sm font-semibold">
+                    {departureDate ? (
+                      <>{departureDate.format("dddd, DD MMMM YYYY")}</>
+                    ) : (
+                      <div className="text-gray-400">Not Selected</div>
+                    )}
+                  </div>
+                </div>
+                {returnDate && (
+                  <div className="mt-3">
+                    <div className="text-xs font-mono text-gray-500">
+                      RETURN DATE:
+                    </div>
+                    <div className="text-sm font-semibold">
+                      <>{returnDate.format("dddd, DD MMMM YYYY")}</>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center">
+                <FontAwesomeIcon
+                  icon={faPerson}
+                  size="xs"
+                  className="mr-[14px] text-gray-300"
+                />
+                <div className="text-gray-500 text-sm">Passengers Details</div>
+              </div>
+              <div className="mt-2 border-b border-dashed">
+                {passengers?.map((passenger, index) => {
+                  return (
+                    <div key={index} className="mb-3 flex gap-3">
+                      <div className="text-xs text-gray-400 mt-1">
+                        {index + 1}.
+                      </div>
+                      <div>
+                        {`${passenger?.title ? `${passenger.title} ` : ""}${
+                          passenger?.firstName ? `${passenger.firstName} ` : ""
+                        }${passenger?.lastName ? `${passenger.lastName}` : ""}`}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-2">
+                <Form.Item
+                  name="agreement"
+                  valuePropName="checked"
+                  rules={[
+                    {
+                      validator: (_, value) =>
+                        value
+                          ? Promise.resolve()
+                          : Promise.reject(
+                              new Error("Please accept the terms and condition")
+                            ),
+                    },
+                  ]}
+                >
+                  <Checkbox>
+                    I accept the <strong>terms and condition</strong>
+                  </Checkbox>
+                </Form.Item>
+                <button
+                  className="bg-green-600 p-2 w-full text-white text-center font-bold text-sm rounded hover:bg-green-700"
+                  onClick={validateOrderForm}
+                >
+                  {loadingCheck || loadingSubmit ? (
+                    <div className="flex items-center gap-2 justify-center">
+                      <div class="flex items-center justify-center">
+                        <FontAwesomeIcon
+                          icon={faSpinner}
+                          className="animate-spin"
+                        />
+                      </div>
+                      <span className="font-semibold text-sm">
+                        {loadingSubmit
+                          ? "Finding Route..."
+                          : "Searching available tickets.."}
+                      </span>
+                    </div>
+                  ) : (
+                    <>Find Flight</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {currentStep === 99 && (
+            <div className="block md:hidden w-full mb-6">
+              <div className="bg-white rounded-lg">
                 <div className=" border-b border-dashed border-gray-200 pb-4 mb-4">
                   <div className="flex items-center mb-2">
                     <FontAwesomeIcon
@@ -597,160 +737,6 @@ const Order = () => {
                 </div>
               </div>
             </div>
-          ) : (
-            currentStep === 99 && (
-              <div className="block md:hidden w-full mb-6">
-                <div className="bg-white rounded-lg">
-                  <div className=" border-b border-dashed border-gray-200 pb-4 mb-4">
-                    <div className="flex items-center mb-2">
-                      <FontAwesomeIcon
-                        icon={faPlane}
-                        size="xs"
-                        className="mr-2 text-gray-300"
-                      />
-                      <div className="text-gray-500 text-sm">
-                        Flight Details
-                      </div>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded">
-                      {flightType && (
-                        <div className="w-full flex justify-center">
-                          {flightType === "one-way" ? (
-                            <div>One Way</div>
-                          ) : (
-                            <div>Round Trip</div>
-                          )}
-                        </div>
-                      )}
-                      <div className="grid grid-cols-[1fr_40px_1fr]">
-                        <div className="text-mono text-5xl text-center">
-                          {origin?.iata_code}
-                        </div>
-                        <div className="flex items-center justify-center">
-                          <FontAwesomeIcon icon={faPlane} />
-                        </div>
-                        <div className="text-mono text-5xl text-center">
-                          {destination?.iata_code}
-                        </div>
-                      </div>
-                      <div></div>
-                    </div>
-                    <div className="mt-3">
-                      <div className="text-xs font-mono text-gray-500">
-                        FROM:
-                      </div>
-                      <div className="text-sm font-semibold mt-1">
-                        {origin?.name}
-                      </div>
-                      <div className="text-xs">{origin?.city_name}</div>
-                    </div>
-                    <div className="mt-3">
-                      <div className="text-xs font-mono text-gray-500">TO:</div>
-                      <div className="text-sm font-semibold">
-                        {destination?.name}
-                      </div>
-                      <div className="text-xs">{destination?.city_name}</div>
-                    </div>
-                    <div className="mt-3">
-                      <div className="text-xs font-mono text-gray-500">
-                        DEPARTURE DATE:
-                      </div>
-                      <div className="text-sm font-semibold">
-                        {departureDate ? (
-                          <>{departureDate.format("dddd, DD MMMM YYYY")}</>
-                        ) : (
-                          <div className="text-gray-400">Not Selected</div>
-                        )}
-                      </div>
-                    </div>
-                    {returnDate && (
-                      <div className="mt-3">
-                        <div className="text-xs font-mono text-gray-500">
-                          RETURN DATE:
-                        </div>
-                        <div className="text-sm font-semibold">
-                          <>{returnDate.format("dddd, DD MMMM YYYY")}</>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center">
-                    <FontAwesomeIcon
-                      icon={faPerson}
-                      size="xs"
-                      className="mr-[14px] text-gray-300"
-                    />
-                    <div className="text-gray-500 text-sm">
-                      Passengers Details
-                    </div>
-                  </div>
-                  <div className="mt-2 border-b border-dashed">
-                    {passengers?.map((passenger, index) => {
-                      return (
-                        <div key={index} className="mb-3 flex gap-3">
-                          <div className="text-xs text-gray-400 mt-1">
-                            {index + 1}.
-                          </div>
-                          <div>
-                            {`${passenger?.title ? `${passenger.title} ` : ""}${
-                              passenger?.firstName
-                                ? `${passenger.firstName} `
-                                : ""
-                            }${
-                              passenger?.lastName ? `${passenger.lastName}` : ""
-                            }`}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="mt-2">
-                    <Form.Item
-                      name="agreement"
-                      valuePropName="checked"
-                      rules={[
-                        {
-                          validator: (_, value) =>
-                            value
-                              ? Promise.resolve()
-                              : Promise.reject(
-                                  new Error(
-                                    "Please accept the terms and condition"
-                                  )
-                                ),
-                        },
-                      ]}
-                    >
-                      <Checkbox>
-                        I accept the <strong>terms and condition</strong>
-                      </Checkbox>
-                    </Form.Item>
-                    <button
-                      className="bg-green-600 p-2 w-full text-white text-center font-bold text-sm rounded hover:bg-green-700"
-                      onClick={validateOrderForm}
-                    >
-                      {loadingCheck || loadingSubmit ? (
-                        <div className="flex items-center gap-2 justify-center">
-                          <div class="flex items-center justify-center">
-                            <FontAwesomeIcon
-                              icon={faSpinner}
-                              className="animate-spin"
-                            />
-                          </div>
-                          <span className="font-semibold text-sm">
-                            {loadingSubmit
-                              ? "Finding Route..."
-                              : "Searching available tickets.."}
-                          </span>
-                        </div>
-                      ) : (
-                        <>Find Flight</>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )
           )}
 
           <div className="fixed bottom-0 left-0 w-full bg-white border-t grid grid-cols-3 md:hidden">

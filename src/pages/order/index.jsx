@@ -336,7 +336,7 @@ const Order = () => {
     }
   };
 
-  const handleReturnTrip = async (values) => {
+  const handleRoundTrip = async (values) => {
     setLoadingSubmit(true);
     try {
       const passengers = values.passengers.map((passenger) => ({
@@ -438,31 +438,39 @@ const Order = () => {
                 .finally(() => {
                   setLoadingCheck(false);
                 });
-              if (order) resolve(order);
-              else reject(new Error("Ticket not found."));
+              if (order) {
+                resolve(order);
+                setLoadingSubmit(false);
+              } else reject(new Error("Ticket not found."));
+            } else {
+              reject(new Error("Ticket not found."));
             }
+          } else {
+            reject(new Error("Ticket not found."));
           }
+        } else {
+          reject(new Error("Ticket not found."));
         }
       });
       toast.promise(searchingTicket, {
-        loading: "Routing your flights",
+        loading: "Searching for your ticket",
         success: "We found ticket for you!",
         error:
           "Sorry, no flight available for now, please retry or change flight",
       });
     } catch (err) {
       console.log(err);
-    } finally {
       setLoadingSubmit(false);
     }
   };
+  console.log(loadingSubmit);
 
   const validateOrderForm = () => {
     form
       .validateFields()
       .then((values) => {
         if (flightType === "round-trip") {
-          handleReturnTrip(values);
+          handleRoundTrip(values);
         } else {
           handleSubmitRequest(values);
         }
@@ -691,6 +699,7 @@ const Order = () => {
                 <button
                   className="bg-green-600 p-2 w-full text-white text-center font-bold text-sm rounded hover:bg-green-700"
                   onClick={validateOrderForm}
+                  disabled={loadingCheck || loadingSubmit}
                 >
                   {loadingCheck || loadingSubmit ? (
                     <div className="flex items-center gap-2 justify-center">
@@ -840,6 +849,7 @@ const Order = () => {
                   <button
                     className="bg-green-600 p-2 w-full text-white text-center font-bold text-sm rounded hover:bg-green-700"
                     onClick={validateOrderForm}
+                    disabled={loadingCheck || loadingSubmit}
                   >
                     {loadingCheck || loadingSubmit ? (
                       <div className="flex items-center gap-2 justify-center">
@@ -874,6 +884,7 @@ const Order = () => {
               onClick={() => {
                 setCurrentStep(0);
               }}
+              disabled={loadingSubmit || loadingCheck}
             >
               {/* <FontAwesomeIcon icon={faPlane} /> */}
               <span
@@ -894,6 +905,7 @@ const Order = () => {
               onClick={() => {
                 setCurrentStep(1);
               }}
+              disabled={loadingSubmit || loadingCheck}
             >
               {/* <FontAwesomeIcon icon={faUserEdit} /> */}
               <span
@@ -914,6 +926,7 @@ const Order = () => {
               onClick={() => {
                 setCurrentStep(99);
               }}
+              disabled={loadingSubmit || loadingCheck}
             >
               <span
                 className={clsx("text-xs", {

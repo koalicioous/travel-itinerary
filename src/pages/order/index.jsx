@@ -336,6 +336,14 @@ const Order = () => {
     }
   };
 
+  const findOutboundFlight = async () => {};
+
+  const findInboundFLight = async () => {};
+
+  const getPartialOfferFullFare = async () => {};
+
+  const createRoundTripOrder = async () => {};
+
   const handleReturnTrip = async (values) => {
     setLoadingSubmit(true);
     try {
@@ -855,7 +863,10 @@ const Order = () => {
           <div className="fixed bottom-0 left-0 w-full bg-white border-t grid grid-cols-3 md:hidden">
             <button
               type="button"
-              className="flex items-center justify-center gap-2 p-4 border-r"
+              className={clsx(
+                "transition-all flex items-center justify-center gap-2 p-4 border-r",
+                { "bg-blue-500": currentStep === 0 }
+              )}
               onClick={() => {
                 setCurrentStep(0);
               }}
@@ -863,7 +874,7 @@ const Order = () => {
               {/* <FontAwesomeIcon icon={faPlane} /> */}
               <span
                 className={clsx("text-xs", {
-                  "text-blue-500 font-semibold": currentStep === 0,
+                  "transition-all  text-white font-semibold": currentStep === 0,
                 })}
               >
                 1. Flight
@@ -872,7 +883,10 @@ const Order = () => {
             </button>
             <button
               type="button"
-              className="flex items-center justify-center gap-2 p-4 border-r"
+              className={clsx(
+                "transition-all flex items-center justify-center gap-2 p-4 border-r",
+                { "bg-blue-500": currentStep === 1 }
+              )}
               onClick={() => {
                 setCurrentStep(1);
               }}
@@ -880,7 +894,7 @@ const Order = () => {
               {/* <FontAwesomeIcon icon={faUserEdit} /> */}
               <span
                 className={clsx("text-xs", {
-                  "text-blue-500 font-semibold": currentStep === 1,
+                  "transition-all  text-white font-semibold": currentStep === 1,
                 })}
               >
                 2. Passengers
@@ -889,14 +903,18 @@ const Order = () => {
             </button>
             <button
               type="button"
-              className="flex items-center justify-center gap-1 p-4"
+              className={clsx(
+                "transition-all flex items-center justify-center gap-2 p-4 border-r",
+                { "bg-blue-500": currentStep === 99 }
+              )}
               onClick={() => {
                 setCurrentStep(99);
               }}
             >
               <span
                 className={clsx("text-xs", {
-                  "text-blue-500 font-semibold": currentStep === 99,
+                  "transition-all  text-white font-semibold":
+                    currentStep === 99,
                 })}
               >
                 3. Review

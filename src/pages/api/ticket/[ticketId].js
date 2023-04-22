@@ -82,7 +82,6 @@ export default async function handler(req, res) {
           },
         });
       } else {
-        console.error(err);
         res.status(404).json({
           message: "No flight available",
         });

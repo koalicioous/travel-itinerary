@@ -1,9 +1,10 @@
 import { Radio, DatePicker, Select, Form } from "antd";
 import axios from "@/services/axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { debounce } from "lodash";
 import { useOrderForm } from "@/context";
 import moment from "moment";
+import { toast } from "react-hot-toast";
 
 const flightOptions = [
   {
@@ -36,57 +37,91 @@ const ChooseFlight = () => {
   const handleSearchOrigin = async (query) => {
     if (!query) return;
     setLoading(true);
-    await axios
-      .get("/place", {
-        params: {
-          q: query,
+    const searching = new Promise(async (resolve, reject) => {
+      await axios
+        .get("/place", {
+          params: {
+            q: query,
+          },
+        })
+        .then((res) => {
+          const { data } = JSON.parse(res.data);
+          const options = data.map((item) => ({
+            value: item.id,
+            label: `${item.iata_code} - ${item.name} ${
+              item.city_name ? `(${item.city_name})` : ""
+            }`,
+            ...item,
+          }));
+          setOriginOptions(options);
+          resolve();
+        })
+        .catch((err) => {
+          console.log(err);
+          reject();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
+    toast.promise(
+      searching,
+      {
+        loading: "Searching airport..",
+        success: "Search complete!",
+        error: "Sorry, search failed :(",
+      },
+      {
+        success: {
+          duration: 100,
         },
-      })
-      .then((res) => {
-        const { data } = JSON.parse(res.data);
-        const options = data.map((item) => ({
-          value: item.id,
-          label: `${item.iata_code} - ${item.name} ${
-            item.city_name ? `(${item.city_name})` : ""
-          }`,
-          ...item,
-        }));
-        setOriginOptions(options);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      }
+    );
   };
 
   const handleSearchDestionation = async (query) => {
     if (!query) return;
     setLoading(true);
-    await axios
-      .get("/place", {
-        params: {
-          q: query,
+    const searching = new Promise(async (resolve, reject) => {
+      await axios
+        .get("/place", {
+          params: {
+            q: query,
+          },
+        })
+        .then((res) => {
+          const { data } = JSON.parse(res.data);
+          const options = data.map((item) => ({
+            value: item.id,
+            label: `${item.iata_code} - ${item.name} ${
+              item.city_name ? `(${item.city_name})` : ""
+            }`,
+            ...item,
+          }));
+          setDestinationOptions(options);
+          resolve();
+        })
+        .catch((err) => {
+          console.log(err);
+          reject();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
+    toast.promise(
+      searching,
+      {
+        loading: "Searching airport..",
+        success: "Search complete!",
+        error: "Sorry, search failed :(",
+      },
+      {
+        success: {
+          duration: 100,
         },
-      })
-      .then((res) => {
-        const { data } = JSON.parse(res.data);
-        const options = data.map((item) => ({
-          value: item.id,
-          label: `${item.iata_code} - ${item.name} ${
-            item.city_name ? `(${item.city_name})` : ""
-          }`,
-          ...item,
-        }));
-        setDestinationOptions(options);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      }
+    );
   };
 
   return (

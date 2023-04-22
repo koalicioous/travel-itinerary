@@ -2,6 +2,7 @@ import { duffel } from "../duffel";
 
 export const createExternalOrder = async (data) => {
   const { offerId, passengers, email } = data;
+  console.log(passengers[0]);
   const result = await duffel.orders.create({
     type: "hold",
     selected_offers: [offerId],

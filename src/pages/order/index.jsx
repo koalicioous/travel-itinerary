@@ -336,11 +336,124 @@ const Order = () => {
     }
   };
 
+  const handleReturnTrip = async (values) => {
+    setLoadingSubmit(true);
+    try {
+      const passengers = values.passengers.map((passenger) => ({
+        family_name: passenger.lastName,
+        given_name: passenger.firstName,
+        title: passenger.title,
+        type: "adult",
+      }));
+      const outboundFlight = await axios.post("/api/create-partial-offer", {
+        supplier_timeout: 20000,
+        slices: [
+          {
+            origin: origin.iata_code,
+            destination: destination.iata_code,
+            departure_date: departureDate.format("YYYY-MM-DD"),
+          },
+          {
+            origin: destination.iata_code,
+            destination: origin.iata_code,
+            departure_date: returnDate.format("YYYY-MM-DD"),
+          },
+        ],
+        passengers,
+      });
+      if (outboundFlight) {
+        const offerPassengers = outboundFlight?.data?.data?.passengers;
+        const selectable = outboundFlight?.data?.data?.offers?.filter(
+          (offer) => {
+            return (
+              offer?.payment_requirements?.requires_instant_payment === false &&
+              offer?.owner?.iata_code !== "ZZ"
+            );
+          }
+        );
+        const inboundFlight = await axios.post("/api/get-partial-offer", {
+          id: outboundFlight?.data?.data?.id,
+          params: {
+            "selected_partial_offer[]": selectable
+              .slice(0, 1)
+              .map(
+                (value) =>
+                  `selected_partial_offer[]=${encodeURIComponent(value.id)}`
+              )
+              .join("&"),
+          },
+        });
+        if (inboundFlight) {
+          const inboundSelectable = inboundFlight?.data?.data?.offers?.filter(
+            (offer) => {
+              return (
+                offer?.payment_requirements?.requires_instant_payment ===
+                  false &&
+                offer?.owner?.iata_code !== "ZZ" &&
+                offer?.id !== selectable[0].id
+              );
+            }
+          );
+          const fullFare = await axios.post("/api/get-partial-offer-fares", {
+            id: outboundFlight?.data?.data?.id,
+            params: {
+              "selected_partial_offer[]": [
+                selectable[0].id,
+                inboundSelectable[0].id,
+              ],
+            },
+          });
+          if (fullFare) {
+            const selectableFare = fullFare?.data?.data?.offers?.filter(
+              (offer) => {
+                return (
+                  offer?.payment_requirements?.requires_instant_payment ===
+                    false && offer?.owner?.iata_code !== "ZZ"
+                );
+              }
+            );
+            const passengerForm = form.getFieldValue("passengers");
+            const mergedPassengers = passengerForm.map((passenger, index) => ({
+              ...passenger,
+              ...offerPassengers[index],
+            }));
+            setLoadingCheck(true);
+            await axios
+              .post(`/api/ticket/${selectableFare?.[0]?.id}`, {
+                email: form.getFieldValue("email"),
+                passengers: mergedPassengers,
+                type: "return-trip",
+              })
+              .then((res) => {
+                setLoadingCheck(false);
+                router.push(`/checkout?orderId=${res?.data?.data?.data?.id}`);
+                resolve(res);
+              })
+              .catch((err) => {
+                reject(err);
+              })
+              .finally(() => {
+                setLoadingCheck(false);
+              });
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoadingSubmit(false);
+    }
+  };
+
   const validateOrderForm = () => {
     form
       .validateFields()
       .then((values) => {
-        handleSubmitRequest(values);
+        if (flightType === "round-trip") {
+          handleReturnTrip(values);
+        } else {
+          handleSubmitRequest(values);
+        }
       })
       .catch((err) => {
         const flightInformationKeys = {
@@ -749,11 +862,11 @@ const Order = () => {
             >
               {/* <FontAwesomeIcon icon={faPlane} /> */}
               <span
-                className={clsx("text-sm", {
+                className={clsx("text-xs", {
                   "text-blue-500 font-semibold": currentStep === 0,
                 })}
               >
-                Flight
+                1. Flight
               </span>
               {/* <FontAwesomeIcon icon={faCheckCircle} size="xs" /> */}
             </button>
@@ -766,11 +879,11 @@ const Order = () => {
             >
               {/* <FontAwesomeIcon icon={faUserEdit} /> */}
               <span
-                className={clsx("text-sm", {
+                className={clsx("text-xs", {
                   "text-blue-500 font-semibold": currentStep === 1,
                 })}
               >
-                Passengers
+                2. Passengers
               </span>
               {/* <FontAwesomeIcon icon={faCheckCircle} size="xs" /> */}
             </button>
@@ -782,11 +895,11 @@ const Order = () => {
               }}
             >
               <span
-                className={clsx("text-sm", {
+                className={clsx("text-xs", {
                   "text-blue-500 font-semibold": currentStep === 99,
                 })}
               >
-                Review
+                3. Review
               </span>
               {/* <FontAwesomeIcon icon={faReceipt} /> */}
             </button>

@@ -336,14 +336,6 @@ const Order = () => {
     }
   };
 
-  const findOutboundFlight = async () => {};
-
-  const findInboundFLight = async () => {};
-
-  const getPartialOfferFullFare = async () => {};
-
-  const createRoundTripOrder = async () => {};
-
   const handleReturnTrip = async (values) => {
     setLoadingSubmit(true);
     try {
@@ -353,99 +345,111 @@ const Order = () => {
         title: passenger.title,
         type: "adult",
       }));
-      const outboundFlight = await axios.post("/api/create-partial-offer", {
-        supplier_timeout: 20000,
-        slices: [
-          {
-            origin: origin.iata_code,
-            destination: destination.iata_code,
-            departure_date: departureDate.format("YYYY-MM-DD"),
-          },
-          {
-            origin: destination.iata_code,
-            destination: origin.iata_code,
-            departure_date: returnDate.format("YYYY-MM-DD"),
-          },
-        ],
-        passengers,
-      });
-      if (outboundFlight) {
-        const offerPassengers = outboundFlight?.data?.data?.passengers;
-        const selectable = outboundFlight?.data?.data?.offers?.filter(
-          (offer) => {
-            return (
-              offer?.payment_requirements?.requires_instant_payment === false &&
-              offer?.owner?.iata_code !== "ZZ"
-            );
-          }
-        );
-        const inboundFlight = await axios.post("/api/get-partial-offer", {
-          id: outboundFlight?.data?.data?.id,
-          params: {
-            "selected_partial_offer[]": selectable
-              .slice(0, 1)
-              .map(
-                (value) =>
-                  `selected_partial_offer[]=${encodeURIComponent(value.id)}`
-              )
-              .join("&"),
-          },
+      const searchingTicket = new Promise(async (resolve, reject) => {
+        const outboundFlight = await axios.post("/api/create-partial-offer", {
+          supplier_timeout: 20000,
+          slices: [
+            {
+              origin: origin.iata_code,
+              destination: destination.iata_code,
+              departure_date: departureDate.format("YYYY-MM-DD"),
+            },
+            {
+              origin: destination.iata_code,
+              destination: origin.iata_code,
+              departure_date: returnDate.format("YYYY-MM-DD"),
+            },
+          ],
+          passengers,
         });
-        if (inboundFlight) {
-          const inboundSelectable = inboundFlight?.data?.data?.offers?.filter(
+        if (outboundFlight) {
+          const offerPassengers = outboundFlight?.data?.data?.passengers;
+          const selectable = outboundFlight?.data?.data?.offers?.filter(
             (offer) => {
               return (
                 offer?.payment_requirements?.requires_instant_payment ===
-                  false &&
-                offer?.owner?.iata_code !== "ZZ" &&
-                offer?.id !== selectable[0].id
+                  false && offer?.owner?.iata_code !== "ZZ"
               );
             }
           );
-          const fullFare = await axios.post("/api/get-partial-offer-fares", {
+          const inboundFlight = await axios.post("/api/get-partial-offer", {
             id: outboundFlight?.data?.data?.id,
             params: {
-              "selected_partial_offer[]": [
-                selectable[0].id,
-                inboundSelectable[0].id,
-              ],
+              "selected_partial_offer[]": selectable
+                .slice(0, 1)
+                .map(
+                  (value) =>
+                    `selected_partial_offer[]=${encodeURIComponent(value.id)}`
+                )
+                .join("&"),
             },
           });
-          if (fullFare) {
-            const selectableFare = fullFare?.data?.data?.offers?.filter(
+          if (inboundFlight) {
+            const inboundSelectable = inboundFlight?.data?.data?.offers?.filter(
               (offer) => {
                 return (
                   offer?.payment_requirements?.requires_instant_payment ===
-                    false && offer?.owner?.iata_code !== "ZZ"
+                    false &&
+                  offer?.owner?.iata_code !== "ZZ" &&
+                  offer?.id !== selectable[0].id
                 );
               }
             );
-            const passengerForm = form.getFieldValue("passengers");
-            const mergedPassengers = passengerForm.map((passenger, index) => ({
-              ...passenger,
-              ...offerPassengers[index],
-            }));
-            setLoadingCheck(true);
-            await axios
-              .post(`/api/ticket/${selectableFare?.[0]?.id}`, {
-                email: form.getFieldValue("email"),
-                passengers: mergedPassengers,
-                type: "return-trip",
-              })
-              .then((res) => {
-                setLoadingCheck(false);
-                router.push(`/checkout?orderId=${res?.data?.data?.data?.id}`);
-                resolve(res);
-              })
-              .catch((err) => {
-                reject(err);
-              })
-              .finally(() => {
-                setLoadingCheck(false);
-              });
+            const fullFare = await axios.post("/api/get-partial-offer-fares", {
+              id: outboundFlight?.data?.data?.id,
+              params: {
+                "selected_partial_offer[]": [
+                  selectable[0].id,
+                  inboundSelectable[0].id,
+                ],
+              },
+            });
+            if (fullFare) {
+              const selectableFare = fullFare?.data?.data?.offers?.filter(
+                (offer) => {
+                  return (
+                    offer?.payment_requirements?.requires_instant_payment ===
+                      false && offer?.owner?.iata_code !== "ZZ"
+                  );
+                }
+              );
+              const passengerForm = form.getFieldValue("passengers");
+              const mergedPassengers = passengerForm.map(
+                (passenger, index) => ({
+                  ...passenger,
+                  ...offerPassengers[index],
+                })
+              );
+              setLoadingCheck(true);
+              const order = await axios
+                .post(`/api/ticket/${selectableFare?.[0]?.id}`, {
+                  email: form.getFieldValue("email"),
+                  passengers: mergedPassengers,
+                  type: "return-trip",
+                })
+                .then((res) => {
+                  setLoadingCheck(false);
+                  router.push(`/checkout?orderId=${res?.data?.data?.data?.id}`);
+                  resolve(res);
+                })
+                .catch((err) => {
+                  reject(err);
+                })
+                .finally(() => {
+                  setLoadingCheck(false);
+                });
+              if (order) resolve(order);
+              else reject(new Error("Ticket not found."));
+            }
           }
         }
-      }
+      });
+      toast.promise(searchingTicket, {
+        loading: "Routing your flights",
+        success: "We found ticket for you!",
+        error:
+          "Sorry, no flight available for now, please retry or change flight",
+      });
     } catch (err) {
       console.log(err);
     } finally {
@@ -703,7 +707,7 @@ const Order = () => {
                       </span>
                     </div>
                   ) : (
-                    <>Find Flight</>
+                    <>Get Flight Itinerary</>
                   )}
                 </button>
               </div>
@@ -852,7 +856,7 @@ const Order = () => {
                         </span>
                       </div>
                     ) : (
-                      <>Find Flight</>
+                      <>Get Flight Itinerary</>
                     )}
                   </button>
                 </div>

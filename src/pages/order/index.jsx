@@ -441,12 +441,17 @@ const Order = () => {
               if (order) {
                 resolve(order);
                 setLoadingSubmit(false);
-              } else reject(new Error("Ticket not found."));
+              } else {
+                reject(new Error("Ticket not found."));
+                setLoadingSubmit(false);
+              }
             } else {
               reject(new Error("Ticket not found."));
+              setLoadingSubmit(false);
             }
           } else {
             reject(new Error("Ticket not found."));
+            setLoadingSubmit(false);
           }
         } else {
           reject(new Error("Ticket not found."));
